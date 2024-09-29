@@ -2,7 +2,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * This class represents a spelling trainer that uses word-picture pairs to train spelling.
+ * Class representing a spelling trainer that uses word-picture pairs to train spelling.
  * @author Leonhard Stransky
  * @version 2024-09-28
  */
@@ -12,15 +12,17 @@ public class SpellingTrainer {
     private Random random;
     private Statistics statistics;
     private Boolean lastResult; // Boolean to store true, false or null if no guess was made
+    private PersistenceStrategy<SpellingTrainer> persistenceStrategy;
 
     // Constructors
 
     /**
      * Constructor for a SpellingTrainer.
      * @param wordPairs The list of word-picture pairs.
+     * @param persistenceStrategy The strategy for saving/loading the SpellingTrainer object.
      * @throws IllegalArgumentException if the wordPairs list is null or empty.
      */
-    public SpellingTrainer(List<WordPicturePair> wordPairs) {
+    public SpellingTrainer(List<WordPicturePair> wordPairs, PersistenceStrategy<SpellingTrainer> persistenceStrategy) {
         if (wordPairs == null || wordPairs.isEmpty()) {
             throw new IllegalArgumentException("No word pairs available.");
         }
@@ -29,6 +31,7 @@ public class SpellingTrainer {
         this.statistics = new Statistics();
         this.selectRandomWordPair(); // Select an initial word pair at startup
         this.lastResult = null;  // No guess made initially
+        this.persistenceStrategy = persistenceStrategy; // Strategy injected
     }
 
     // Getters and Setters
@@ -65,7 +68,7 @@ public class SpellingTrainer {
             throw new IllegalArgumentException("Guess cannot be null or empty.");
         }
 
-        this.lastResult = guess.equals(currentWordPair.getWord());
+        this.lastResult = guess.equals(this.currentWordPair.getWord());
         if(this.lastResult) {
             this.statistics.incrementCorrectGuesses();
         } else {
@@ -74,12 +77,19 @@ public class SpellingTrainer {
         return this.lastResult;
     }
 
+    /**
+     * Saves the SpellingTrainer object using the current persistence strategy.
+     */
     public void persistData() {
-        // Implement here
+        this.persistenceStrategy.saveData(this);
     }
 
-    public void loadData() {
-        // Implement here
+    /**
+     * Loads the SpellingTrainer object using the current persistence strategy.
+     * @return The loaded SpellingTrainer object.
+     */
+    public SpellingTrainer loadData(PersistenceStrategy<SpellingTrainer> persistenceStrategy) {
+        return persistenceStrategy.loadData();
     }
 
     /**
@@ -89,7 +99,7 @@ public class SpellingTrainer {
     @Override
     public String toString() {
         return "Current Word Pair: " + this.currentWordPair + "\n" +
-                "Statistics: " + this.statistics.toString() +
+                "Statistics: " + this.statistics.toString() + "\n" +
                 "Last Result: " + this.lastResult;
     }
 }
