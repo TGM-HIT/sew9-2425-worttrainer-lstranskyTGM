@@ -2,6 +2,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class tests {
     private List<WordPicturePair> wordPairs;
 
     private Statistics stats;
+    private JSONPersistence jsonPersistence;
 
     // Test setup before each test method
     @BeforeEach
@@ -26,7 +28,9 @@ public class tests {
         validPair1 = new WordPicturePair("Cat", "http://example.com/cat.jpg");
         validPair2 = new WordPicturePair("Dog", "http://example.com/dog.jpg");
         wordPairs = Arrays.asList(validPair1, validPair2);
-        trainer = new SpellingTrainer(wordPairs);
+
+        jsonPersistence = new JSONPersistence();
+        trainer = new SpellingTrainer(wordPairs, jsonPersistence);
         stats = new Statistics();
     }
 
@@ -85,7 +89,7 @@ public class tests {
     @Test
     public void testSpellingTrainerConstructor_Invalid() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new SpellingTrainer(null);
+            new SpellingTrainer(null, jsonPersistence);
         });
         assertEquals("No word pairs available.", exception.getMessage());
     }
@@ -164,5 +168,35 @@ public class tests {
         assertEquals(0, stats.getCorrectGuesses());
         assertEquals(0, stats.getIncorrectGuesses());
         assertEquals(0, stats.getTotalGuesses());
+    }
+
+    // JSONPersistence Tests
+
+    @Test
+    public void testJSONPersistenceSaveData() {
+        JSONPersistence jsonPersistence = new JSONPersistence();
+        trainer = new SpellingTrainer(wordPairs, jsonPersistence);
+
+        jsonPersistence.saveData(trainer);
+
+        // Check that the file exists and is not empty
+        // File operations are environment dependent, so this test should be more thorough with integration tests
+        File file = new File("spelling_trainer_data.json");
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
+    }
+
+    @Test
+    public void testJSONPersistenceLoadData() {
+        JSONPersistence jsonPersistence = new JSONPersistence();
+        trainer = new SpellingTrainer(wordPairs, jsonPersistence);
+
+        // Save the trainer
+        jsonPersistence.saveData(trainer);
+
+        // Now load the trainer from the file
+        SpellingTrainer loadedTrainer = jsonPersistence.loadData();
+        assertNotNull(loadedTrainer);
+        assertEquals(trainer.getCurrentWordPair().getWord(), loadedTrainer.getCurrentWordPair().getWord());
     }
 }

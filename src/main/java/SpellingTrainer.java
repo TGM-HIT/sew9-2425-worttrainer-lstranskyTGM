@@ -9,10 +9,10 @@ import java.util.Random;
 public class SpellingTrainer {
     private List<WordPicturePair> wordPairs;
     private WordPicturePair currentWordPair;
-    private Random random;
+    private transient Random random; // transient keyword to exclude from serialization
     private Statistics statistics;
     private Boolean lastResult; // Boolean to store true, false or null if no guess was made
-    private PersistenceStrategy<SpellingTrainer> persistenceStrategy;
+    private transient PersistenceStrategy<SpellingTrainer> persistenceStrategy; // transient keyword to exclude from serialization
 
     // Constructors
 
