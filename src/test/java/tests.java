@@ -22,6 +22,8 @@ public class tests {
     private Statistics stats;
     private JSONPersistence jsonPersistence;
 
+    private static final String TEST_FILE_PATH = "test_spelling_trainer_data.json";  // File path for testing
+
     // Test setup before each test method
     @BeforeEach
     public void setUp() {
@@ -29,7 +31,7 @@ public class tests {
         validPair2 = new WordPicturePair("Dog", "http://example.com/dog.jpg");
         wordPairs = Arrays.asList(validPair1, validPair2);
 
-        jsonPersistence = new JSONPersistence();
+        jsonPersistence = new JSONPersistence(TEST_FILE_PATH);
         trainer = new SpellingTrainer(wordPairs, jsonPersistence);
         stats = new Statistics();
     }
@@ -174,7 +176,7 @@ public class tests {
 
     @Test
     public void testJSONPersistenceSaveData() {
-        JSONPersistence jsonPersistence = new JSONPersistence();
+        JSONPersistence jsonPersistence = new JSONPersistence(TEST_FILE_PATH);
         trainer = new SpellingTrainer(wordPairs, jsonPersistence);
 
         jsonPersistence.saveData(trainer);
@@ -188,7 +190,7 @@ public class tests {
 
     @Test
     public void testJSONPersistenceLoadData() {
-        JSONPersistence jsonPersistence = new JSONPersistence();
+        JSONPersistence jsonPersistence = new JSONPersistence(TEST_FILE_PATH);
         trainer = new SpellingTrainer(wordPairs, jsonPersistence);
 
         // Save the trainer

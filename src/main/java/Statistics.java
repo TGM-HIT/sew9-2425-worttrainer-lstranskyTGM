@@ -1,5 +1,5 @@
 /**
- * This class represents the statistics of a spelling trainer.
+ * Class representing the statistics for a spelling trainer.
  * @author Leonhard Stransky
  * @version 2024-09-28
  */
@@ -19,7 +19,7 @@ public class Statistics {
         this.totalGuesses = 0;
     }
 
-    // Getters
+    // Getters and Setters
 
     public int getCorrectGuesses() {
         return this.correctGuesses;

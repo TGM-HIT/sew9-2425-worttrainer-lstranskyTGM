@@ -1,7 +1,7 @@
 import java.util.regex.Pattern;
 
 /**
- * This class represents a pair of a word and an image URL.
+ * Class representing a pair consisting of a word and an image URL.
  * @author Leonhard Stransky
  * @version 2024-09-28
  */
@@ -84,7 +84,3 @@ public class WordPicturePair {
         return this.word + " / " + this.imageUrl;
     }
 }
-
-
-
-

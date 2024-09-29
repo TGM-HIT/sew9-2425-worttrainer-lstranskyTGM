@@ -150,10 +150,9 @@ public class SpellingTrainerUI {
     public static void main(String[] args) {
         // Example word-picture pairs
         List<WordPicturePair> wordPairs = List.of(
-                new WordPicturePair("Java", "https://cdn-icons-png.flaticon.com/512/154/154878.png"),
-                new WordPicturePair("Python", "https://cdn3.iconfinder.com/data/icons/logos-and-brands-adobe/512/267_Python-512.png"),
-                new WordPicturePair("Bird", "https://i.pinimg.com/736x/be/c9/a4/bec9a4030b5ded947f1538978dc120e7.jpg"),
-                new WordPicturePair("Car", "https://fcache1.pakwheels.com/original/3X/a/b/ab84bb85871d7a7dd641f2bf20a0e8e8d1f07979.jpg")
+                new WordPicturePair("Bird", "https://example.com/bird.jpg"),
+                new WordPicturePair("Cat", "https://example.com/cat.jpg"),
+                new WordPicturePair("Car", "https://example.com/car.jpg")
         );
 
         // Use JSON persistence strategy
