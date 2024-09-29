@@ -9,7 +9,6 @@ import java.util.Random;
 public class SpellingTrainer {
     private List<WordPicturePair> wordPairs;
     private WordPicturePair currentWordPair;
-    private transient Random random; // transient keyword to exclude from serialization
     private Statistics statistics;
     private Boolean lastResult; // Boolean to store true, false or null if no guess was made
     private transient PersistenceStrategy<SpellingTrainer> persistenceStrategy; // transient keyword to exclude from serialization
@@ -27,7 +26,6 @@ public class SpellingTrainer {
             throw new IllegalArgumentException("No word pairs available.");
         }
         this.wordPairs = wordPairs;
-        this.random = new Random();
         this.statistics = new Statistics();
         this.selectRandomWordPair(); // Select an initial word pair at startup
         this.lastResult = null;  // No guess made initially
@@ -48,12 +46,17 @@ public class SpellingTrainer {
         return this.lastResult;
     }
 
+    public void setPersistenceStrategy(PersistenceStrategy<SpellingTrainer> persistenceStrategy) {
+        this.persistenceStrategy = persistenceStrategy;
+    }
+
     // Methods
 
     /**
      * Selects a random word-picture pair from the list of word pairs.
      */
     public void selectRandomWordPair() {
+        Random random = new Random();
         this.currentWordPair = this.wordPairs.get(random.nextInt(this.wordPairs.size()));
         this.lastResult = null; // Reset last result since a new pair is selected
     }

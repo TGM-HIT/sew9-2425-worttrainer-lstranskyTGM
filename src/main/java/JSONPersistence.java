@@ -9,16 +9,28 @@ import java.io.IOException;
  * @version 2024-09-29
  */
 public class JSONPersistence implements PersistenceStrategy<SpellingTrainer> {
-
-    private static final String FILE_PATH = "spelling_trainer_data.json";
+    private String filePath;
     private Gson gson;
 
     /**
      * Constructor for the JSONPersistence class.
      */
-    public JSONPersistence() {
+    public JSONPersistence(String filePath) {
         this.gson = new Gson();
+        this.filePath = filePath;
     }
+
+    // Getters and Setters
+
+    /**
+     * Sets a new file path dynamically.
+     * @param filePath The new file path for saving/loading.
+     */
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    // Methods
 
     /**
      * Saves the SpellingTrainer object to a JSON file.
@@ -26,7 +38,7 @@ public class JSONPersistence implements PersistenceStrategy<SpellingTrainer> {
      */
     @Override
     public void saveData(SpellingTrainer trainer) {
-        try (FileWriter writer = new FileWriter(FILE_PATH)) {
+        try (FileWriter writer = new FileWriter(this.filePath)) {
             gson.toJson(trainer, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,8 +51,13 @@ public class JSONPersistence implements PersistenceStrategy<SpellingTrainer> {
      */
     @Override
     public SpellingTrainer loadData() {
-        try (FileReader reader = new FileReader(FILE_PATH)) {
-            return gson.fromJson(reader, SpellingTrainer.class);
+        try (FileReader reader = new FileReader(this.filePath)) {
+            SpellingTrainer trainer = gson.fromJson(reader, SpellingTrainer.class);
+            if (trainer != null) {
+                // Automatically inject the persistence strategy after loading
+                trainer.setPersistenceStrategy(this);
+            }
+            return trainer;
         } catch (IOException e) {
             e.printStackTrace();
         }
