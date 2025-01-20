@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.Image;
+import java.awt.BorderLayout;
 import java.util.List;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,8 +28,7 @@ public class SpellingTrainerUI {
      */
     public void start() {
         while (running) {
-            showCurrentWordPair();
-            String guess = getUserGuess();
+            String guess = showCurrentWordPairAndGetGuess();
 
             if (guess == null || guess.trim().isEmpty()) {
                 int confirm = JOptionPane.showConfirmDialog(null, "Do you want to exit the trainer?",
@@ -53,9 +53,10 @@ public class SpellingTrainerUI {
     }
 
     /**
-     * Shows the current word-picture pair with an image (if available).
+     * Combines the image and input field into a single dialog.
+     * @return The user's input as a string, or null if canceled.
      */
-    private void showCurrentWordPair() {
+    private String showCurrentWordPairAndGetGuess() {
         WordPicturePair pair = trainer.getCurrentWordPair();
         String message = "Can you guess the word for the following picture?";
         String imageUrl = pair.getImageUrl();
@@ -68,39 +69,42 @@ public class SpellingTrainerUI {
             if (imageIcon.getIconWidth() == -1 || imageIcon.getIconHeight() == -1) {
                 // The image failed to load
                 JOptionPane.showMessageDialog(null, "Failed to load image. URL might be invalid.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                // Get original dimensions
-                int originalWidth = imageIcon.getIconWidth();
-                int originalHeight = imageIcon.getIconHeight();
+                return null;
+            }
 
-                // Desired size while keeping aspect ratio
-                int targetWidth = 300;
-                int targetHeight = (int) (originalHeight * ((double) targetWidth / originalWidth)); // Maintain aspect ratio
+            // Resize the image to fit in the dialog
+            int targetWidth = 300;
+            int targetHeight = (int) (imageIcon.getIconHeight() * ((double) targetWidth / imageIcon.getIconWidth()));
+            Image scaledImage = imageIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+            imageIcon = new ImageIcon(scaledImage);
 
-                // Resize the image
-                Image scaledImage = imageIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-                imageIcon = new ImageIcon(scaledImage); // Back to ImageIcon
+            // Create a panel to hold the image and input field
+            JPanel panel = new JPanel(new BorderLayout());
 
-                // Set the message and icon in a JLabel
-                JLabel label = new JLabel(message, imageIcon, JLabel.CENTER);
-                label.setVerticalTextPosition(JLabel.TOP); // Place text above the image
-                label.setHorizontalTextPosition(JLabel.CENTER); // Center the image and text
-                label.setIconTextGap(10); // Set some gap between the text and the image
+            // Add the image to the top of the panel
+            JLabel imageLabel = new JLabel(message, imageIcon, JLabel.CENTER);
+            imageLabel.setVerticalTextPosition(JLabel.TOP);
+            imageLabel.setHorizontalTextPosition(JLabel.CENTER);
+            imageLabel.setIconTextGap(10); // Set some gap between text and image
+            panel.add(imageLabel, BorderLayout.CENTER);
 
-                // Display in a message dialog
-                JOptionPane.showMessageDialog(null, label, "Guess the Word", JOptionPane.INFORMATION_MESSAGE);
+            // Add the input field to the bottom of the panel
+            JTextField inputField = new JTextField();
+            inputField.setBorder(BorderFactory.createTitledBorder("Your Guess"));
+            panel.add(inputField, BorderLayout.SOUTH);
+
+            // Show the dialog
+            int result = JOptionPane.showConfirmDialog(null, panel, "Guess the Word",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                return inputField.getText();
             }
         } catch (MalformedURLException e) {
             JOptionPane.showMessageDialog(null, "Error: Invalid image URL!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
 
-    /**
-     * Prompts the user to enter their guess for the word.
-     * @return The user's input.
-     */
-    private String getUserGuess() {
-        return JOptionPane.showInputDialog(null, "Enter your guess:");
+        return null; // Return null if the user cancels or an error occurs
     }
 
     /**
@@ -156,7 +160,7 @@ public class SpellingTrainerUI {
         );
 
         // Use JSON persistence strategy
-        String filePath = "spelling_trainer_data.json"; // Change manually or dynamically by user input or config
+        String filePath = "spelling_trainer_data_V2.json"; // Change manually or dynamically by user input or config
         JSONPersistence persistenceStrategy = new JSONPersistence(filePath);
 
         // Load existing trainer data or create a new one
