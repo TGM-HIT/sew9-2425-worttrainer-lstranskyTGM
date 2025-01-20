@@ -17,7 +17,12 @@ dependencies {
 }
 
 tasks.named('shadowJar') {
-    archiveClassifier.set('all')
+    archiveClassifier.set('all') // Include all dependencies in the JAR
+    manifest {
+        attributes(
+                'Main-Class': 'SpellingTrainerUI'
+        )
+    }
 }
 
 test {
